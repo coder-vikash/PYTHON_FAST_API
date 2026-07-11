@@ -66,3 +66,7 @@ def sort_patient(
     )
 
     return sorted_data
+
+@app.post("/create-patient")
+def create_patient():
+    

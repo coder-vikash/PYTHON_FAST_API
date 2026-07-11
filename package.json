@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "uvicorn": "^0.0.1-security"
+    "pydantic": "^0.0.1-security"
   }
 }
