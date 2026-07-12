@@ -1,4 +1,4 @@
-from pydantic import BaseModel,EmailStr,Field
+from pydantic import BaseModel,EmailStr,Field,field_validator
 from typing import List, Dict,Optional,Annotated
 
 class Patient(BaseModel):
@@ -18,6 +18,23 @@ class Patient(BaseModel):
     patient_contactNo: Dict[str, str]
 
 
+    @field_validator("email")
+    @classmethod
+    def email_validator(cls,value):
+        valid_domain= ["hdfc.com","icici.com","axis.com"]
+
+        domain_name= value.split("@")[-1]
+
+        if domain_name not in valid_domain:
+            raise ValueError("Not a valid domain")
+        return value
+    
+
+    @field_validator("name")
+    @classmethod
+    def Upper_Name(cls,value):
+        return value.upper()
+
 def Patient_data(patient: Patient):
     print(patient.name)
     print(patient.age)
@@ -31,7 +48,7 @@ def Patient_data(patient: Patient):
 Patient_info = {
     "name": "vikash",
     "age": 34,
-    "email":"vk@gmail.com",
+    "email":"vk@axis.com",
     "weight": 68.5,
     "marrage": True,
     "patient_alergy": ["Dust", "Pollen"],
