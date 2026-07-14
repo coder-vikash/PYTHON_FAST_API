@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Path, Query, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, computed_field
-from typing import Annotated, Literal
+from typing import Annotated, Literal,Optional
 import json
 
 app = FastAPI()
@@ -94,6 +94,13 @@ class Patient(BaseModel):
             return "Obese"
 
 
+class PatientUpdate(BaseModel):
+    name: str | None = None
+    city: str | None = None
+    age: int | None = Field(default=None, gt=0)
+    gender: Literal["male", "female", "others"] | None = None
+    height: float | None = Field(default=None, gt=0)
+    weight: float | None = Field(default=None, gt=0)
 # ------------------------- File Functions ------------------------- #
 
 def load_data():
@@ -206,5 +213,76 @@ def create_patient(patient: Patient):
         content={
             "message": "Patient created successfully",
             "patient": patient_data
+        }
+    )
+
+@app.put("/edit/{patient_id}")
+def update_patient(patient_id: str, patient_update: PatientUpdate):
+
+    data = load_data()
+
+    if patient_id not in data:
+        raise HTTPException(
+            status_code=404,
+            detail="Patient ID not found"
+        )
+
+    existing_patient_info = data[patient_id]
+
+    # Only update the fields sent by the client
+    updated_patient_info = patient_update.model_dump(exclude_unset=True)
+
+    existing_patient_info.update(updated_patient_info)
+
+    # Remove old computed fields if present
+    existing_patient_info.pop("bmi", None)
+    existing_patient_info.pop("verdict", None)
+
+    # Add id back temporarily
+    existing_patient_info["id"] = patient_id
+
+    # Recalculate BMI and verdict
+    patient_obj = Patient(**existing_patient_info)
+
+    # Save everything except id
+    data[patient_id] = patient_obj.model_dump(
+        exclude={"id"},
+        mode="json"
+    )
+
+    save_data(data)
+
+    return {
+        "message": "Patient updated successfully",
+        "patient": data[patient_id]
+    }
+
+
+@app.delete("/delete/{patient_id}")
+def delete_patient(patient_id: str):
+    # Load existing data
+    data = load_data()
+
+    # Check if patient exists
+    if patient_id not in data:
+        raise HTTPException(
+            status_code=404,
+            detail="Patient not found"
+        )
+
+    # Delete patient
+    del data[patient_id]
+
+    # Save updated data
+    save_data(data)
+
+    return JSONResponse(
+        status_code=200,
+        content={
+            "message": "Patient deleted successfully",
+            "deleted_patient": {
+                "id": patient_id,
+                
+            }
         }
     )

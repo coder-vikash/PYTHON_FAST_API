@@ -1,14 +1,4 @@
 {
-    "P001": {
-        "name": "Ananya Sharma",
-        "city": "Guwahati",
-        "age": 28,
-        "gender": "female",
-        "height": 1.65,
-        "weight": 90.0,
-        "bmi": 33.06,
-        "verdict": "Obese"
-    },
     "P002": {
         "name": "Ravi Mehta",
         "city": "Mumbai",
@@ -53,6 +43,16 @@
         "name": "Rahul Kumar jha",
         "city": "Greater noida",
         "age": 29,
+        "gender": "male",
+        "height": 1.75,
+        "weight": 70.5,
+        "bmi": 23.02,
+        "verdict": "Normal"
+    },
+    "P001": {
+        "name": "Rahul Kumar",
+        "city": "Noida",
+        "age": 25,
         "gender": "male",
         "height": 1.75,
         "weight": 70.5,
